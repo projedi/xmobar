@@ -70,6 +70,10 @@ flag with_xpm
   description: Enable usage of xpm for icons
   default: False
 
+flag with_nm
+  description: NetworkManager support.
+  default: False
+
 flag with_threaded
   description: Use threaded runtime.
   default: False
@@ -175,3 +179,8 @@ executable xmobar
        extra-libraries: Xpm
        other-modules: XPMFile
        cpp-options: -DXPM
+
+    if flag(with_nm) || flag(all_extensions)
+       build-depends: dbus >= 0.10
+       other-modules: Plugins.Monitors.NetworkManager
+       cpp-options: -DNETWORKMANAGER

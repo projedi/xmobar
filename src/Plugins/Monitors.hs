@@ -49,6 +49,9 @@ import Plugins.Monitors.Volume
 #ifdef MPRIS
 import Plugins.Monitors.Mpris
 #endif
+#ifdef NETWORKMANAGER
+import Plugins.Monitors.NetworkManager
+#endif
 
 data Monitors = Weather      Station     Args Rate
               | Network      Interface   Args Rate
@@ -84,6 +87,9 @@ data Monitors = Weather      Station     Args Rate
 #ifdef MPRIS
               | Mpris1   String     Args Rate
               | Mpris2   String     Args Rate
+#endif
+#ifdef NETWORKMANAGER
+              | NetworkManager Args Rate
 #endif
                 deriving (Show,Read,Eq)
 
@@ -133,6 +139,9 @@ instance Exec Monitors where
     alias (Mpris1 _ _ _) = "mpris1"
     alias (Mpris2 _ _ _) = "mpris2"
 #endif
+#ifdef NETWORKMANAGER
+    alias (NetworkManager _ _) = "nm"
+#endif
     start (Network  i a r) = startNet i a r
     start (DynNetwork a r) = startDynNet a r
     start (Cpu a r) = startCpu a r
@@ -168,4 +177,7 @@ instance Exec Monitors where
 #ifdef MPRIS
     start (Mpris1 s a r) = runM a mprisConfig (runMPRIS1 s) r
     start (Mpris2 s a r) = runM a mprisConfig (runMPRIS2 s) r
+#endif
+#ifdef NETWORKMANAGER
+    start (NetworkManager a r) = runM a networkManagerConfig runNetworkManager r
 #endif
