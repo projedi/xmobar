@@ -54,14 +54,14 @@ getProperty
    -> MemberName
    -> IO (Maybe a)
 getProperty client path dest interface propName = do
-   reply <- call_ client (methodCall path "org.freedesktop.DBus.Properties" "Get")
+   reply <- call client (methodCall path "org.freedesktop.DBus.Properties" "Get")
       { methodCallDestination = dest
       , methodCallBody =
          [ toVariant interface
          , toVariant propName
          ]
       }
-   return $ fromVariant =<< fromVariant =<< listToMaybe (methodReturnBody reply)
+   return $ fromVariant =<< fromVariant =<< listToMaybe =<< either (const Nothing) (Just . methodReturnBody) reply
 
 getActiveConnectionPath :: Client -> IO (Maybe ObjectPath)
 getActiveConnectionPath client = do
