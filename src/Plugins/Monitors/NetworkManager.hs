@@ -33,7 +33,7 @@ data NetworkManagerOpts = NetworkManagerOpts
    { statusOther :: String
    , statusWired :: String
    , statusWireless :: String
-   , qualityDynamicString :: Maybe DynamicString
+   , qualityIconPattern :: Maybe IconPattern
    }
 
 defaultOpts :: NetworkManagerOpts
@@ -41,7 +41,7 @@ defaultOpts = NetworkManagerOpts
    { statusOther = "Other"
    , statusWired = "Wired"
    , statusWireless = "Wireless"
-   , qualityDynamicString = Nothing
+   , qualityIconPattern = Nothing
    }
 
 options :: [OptDescr (NetworkManagerOpts -> NetworkManagerOpts)]
@@ -49,8 +49,8 @@ options =
    [ Option "o" ["status-other"] (ReqArg (\d opts -> opts { statusOther = d }) "") ""
    , Option "w" ["status-wired"] (ReqArg (\d opts -> opts { statusWired = d }) "") ""
    , Option "W" ["status-wireless"] (ReqArg (\d opts -> opts { statusWireless = d }) "") ""
-   , Option "" ["quality-dynamic-string"] (ReqArg (\d opts ->
-      opts { qualityDynamicString = Just $ parseDynamicString d }) "") ""
+   , Option "" ["quality-icon-pattern"] (ReqArg (\d opts ->
+      opts { qualityIconPattern = Just $ parseIconPattern d }) "") ""
    ]
 
 parseOpts :: [String] -> IO NetworkManagerOpts
@@ -234,7 +234,7 @@ getActiveConnectionIPv6 =
 networkManagerConfig :: IO MConfig
 networkManagerConfig = mkMConfig "<status>"
    [ "status", "ipv4", "ipsv4", "ipv6", "ipsv6", "dev", "name" -- General
-   , "essid", "quality", "qualitybar", "qualityvbar", "qualitydstr" -- Wireless only
+   , "essid", "quality", "qualitybar", "qualityvbar", "qualityipat" -- Wireless only
    ]
 
 -- Just like in Mpris module
@@ -257,8 +257,8 @@ formatWireless opts (Just Wireless) (Just cobj) = do
        q <- showPercentWithColors (qlty / 100)
        qb <- showPercentBar qlty (qlty / 100)
        qvb <- showVerticalBar qlty (qlty / 100)
-       qdstr <- showDynamicString (qualityDynamicString opts) (qlty / 100)
-       return [ByteStringChar8.unpack (_ssid s), q, qb, qvb, qdstr]
+       qipat <- showIconPattern (qualityIconPattern opts) (qlty / 100)
+       return [ByteStringChar8.unpack (_ssid s), q, qb, qvb, qipat]
 formatWireless _ _ _ = return $ replicate 5 ""
 
 formatIPs :: [IPv4] -> [IPv6] -> Monitor [String]
